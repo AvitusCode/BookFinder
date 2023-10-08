@@ -3,8 +3,6 @@
 class BoundingBox(object):
     """
     The BoundingBox is defined by the vertex coordinates of the box;
-    from the vertex coordinate, we can get the angles of the bounding box,
-    the bounding box's center position, etc.
     """
 
     def __init__(self, points):
