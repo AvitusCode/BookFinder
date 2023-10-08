@@ -15,3 +15,6 @@ The task of the program will be as follows. It is necessary to recognize from th
 2. picture -> canny algorithm for book edges finding -> ... -> profit! We have received a list of filmed books 
 
 ## Restrictions
+1. Books should be placed on the shelves
+2. One photo <-> one shelf
+3. Books should turned face-up or crust-up to the camera
