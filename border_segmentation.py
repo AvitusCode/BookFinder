@@ -2,9 +2,10 @@ import math
 import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
+import Book
 
 # Some utility functions for work flow
-DEBUG: bool = True  # for debugability
+DEBUG: bool = True # for debugability
 
 
 def image_plot(img, color='gray'):
@@ -223,7 +224,7 @@ def merge_lines(points, image):
     output = image.copy()
 
     for p in new_points2:
-        cv.line(output, (p[0][0], p[0][1]), (p[1][0], p[1][1]), (0, 255, 255), 2)
+        cv.line(output, (p[0][0], p[0][1]), (p[1][0], p[1][1]), (0, 255, 0), 2)
 
     if DEBUG:
         print("Merge Lines", pset)
@@ -251,5 +252,17 @@ def get_book_border(img_path, resize: int = 1024):
     proc_img, levels = connected_components(edged)
     proc_img = remove_short_clusters(proc_img, levels, threshold=200)
     points = HoughLines(proc_img, image, 130)
-
     points, proc_img = merge_lines(points, image)
+
+    books = []
+    for i in range(len(points) - 1):
+        book_points = list()
+
+        book_points.append(points[i][0][0]) # x0
+        book_points.append(points[i][0][1]) # y0
+        book_points.append(points[i + 1][1][0]) # x1
+        book_points.append(points[i + 1][1][1]) # y1
+
+        books.append(Book.BoundingBox(book_points))
+
+    return image, books
