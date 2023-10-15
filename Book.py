@@ -19,3 +19,19 @@ class BoundingBox(object):
 
     def get_box_coordinates(self):
         return self.x0, self.y0, self.x1, self.y1
+
+
+class BookInfo(object):
+    """
+    Information about author and his book
+    """
+
+    def __init__(self, author: str, book: str):
+        self.author = author
+        self.book = book
+
+    def get_author_name(self):
+        return self.author
+
+    def get_book_name(self):
+        return self.book
