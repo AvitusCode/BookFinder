@@ -1,20 +1,12 @@
 import math
+import matplotlib.pyplot as plt
 import numpy as np
 import cv2 as cv
-import matplotlib.pyplot as plt
+import Plotter
 import Book
 
 # Some utility functions for work flow
 DEBUG: bool = True # for debugability
-
-
-def image_plot(img, color='gray'):
-    if color == 'gray':
-        plt.imshow(img, cmap='gray', interpolation='none')
-        plt.show()
-    else:
-        plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
-        plt.show()
 
 
 def canny_border(img, low_threshold, high_threshold):
@@ -22,7 +14,7 @@ def canny_border(img, low_threshold, high_threshold):
 
     if DEBUG:
         print('Canny edges: ')
-        image_plot(canny_edges)
+        Plotter.image_plot(canny_edges)
 
     return canny_edges
 
@@ -32,7 +24,7 @@ def gauss_blur(img, filter_size, sigma):
 
     if DEBUG:
         print("Gauss blur")
-        image_plot(blured)
+        Plotter.image_plot(blured)
 
     return blured
 
@@ -46,7 +38,7 @@ def close_image(img, x, y):
 
     if DEBUG:
         print('Close image')
-        image_plot(closed)
+        Plotter.image_plot(closed)
 
     return closed
 
@@ -62,7 +54,7 @@ def connected_components(edge_map):
         print(proc_img.ravel())
         plt.hist(proc_img.ravel(), levels-1, [2, levels])
         plt.show()
-        image_plot(proc_img)
+        Plotter.image_plot(proc_img)
 
     return proc_img, levels
 
@@ -93,7 +85,7 @@ def remove_short_clusters(img, levels, threshold=200):
     if DEBUG:
         print("Clusters {} with threshold {}".format(len(max_freq), threshold))
         print("Remove short clusters")
-        image_plot(new_img)
+        Plotter.image_plot(new_img)
 
     return new_img
 
@@ -163,7 +155,7 @@ def HoughLines(img, image, min_votes):
 
     if DEBUG:
         print("Lines detected :", lines.shape)
-        image_plot(output, color="color")
+        Plotter.image_plot(output, color="color")
 
     return points
 
@@ -229,7 +221,7 @@ def merge_lines(points, image):
     if DEBUG:
         print("Merge Lines", pset)
         print(new_points2)
-        image_plot(output, color="color")
+        Plotter.image_plot(output, color="color")
 
     return new_points, output
 
