@@ -7,21 +7,24 @@ web_pages_count = 2
 
 # TODO:
 # 1) improve book border recognition
-# 2) finish the text recognition algorithm
-# 3) function to match data with data base
+# 2) improve book text recognition
+# 3) make json file for base configuration
 # 4) Introduce algorithm for rating films
 # 5) refactoring and debuging
 
 
 def main():
-    image, books = bs.get_book_border('debug_data/debug_books_3.jpg')
+    image, books = bs.get_book_border('debug_data/debug_books_5.jpg')
 
     # then wee save books to the file
     for book in books:
         print("[(x0={}, y0={}), (x1={}, y1={})]".format(book.x0, book.y0, book.x1, book.y1))
 
     # wdp.save_data_base(web_data, web_pages_count)
-    br.book_recognizer(image, books)
+    books = br.book_recognizer(image, books)
+
+    for book in books:
+        print("{} - {}".format(book.author, book.book))
 
 
 if __name__ == '__main__':

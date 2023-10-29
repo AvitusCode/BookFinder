@@ -47,8 +47,13 @@ def get_web_data(url, pages: int):
 
 
 def save_data_base(url, pages: int):
-    books_info = get_web_data(url, pages)
+    try:
+        books_info = get_web_data(url, pages)
 
-    with open("res/data_base.txt", "w", encoding="utf-8") as out:
-        for info in books_info:
-            out.write("{} - {}\n".format(info.get_author_name(), info.get_book_name()))
+        with open("res/data_base.txt", "w", encoding="utf-8") as out:
+            for info in books_info:
+                out.write("{} - {}\n".format(info.get_author_name(), info.get_book_name()))
+    except ValueError:
+        print("Some error during get web data")
+    except Exception as err:
+        print(f"Unexpected error {err=}, {type(err)=}")
