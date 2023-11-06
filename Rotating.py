@@ -125,3 +125,21 @@ def crop_around_center(image, width, height):
     y2 = int(image_center[1] + height * 0.5)
 
     return image[y1:y2, x1:x2]
+
+
+def make_rotate_by_angle(image, angle):
+    if angle % 360 == 0:
+        return image
+
+    image_height, image_width = image.shape[0:2]
+    image_rotated = rotate_image(image, angle)
+    image_rotated = crop_around_center(
+        image_rotated,
+        *largest_rotated_rect(
+            image_width,
+            image_height,
+            math.radians(angle)
+        )
+    )
+
+    return image_rotated

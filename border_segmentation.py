@@ -6,7 +6,7 @@ import Plotter
 import Book
 
 # Some utility functions for work flow
-DEBUG: bool = True # for debugability
+DEBUG: bool = False # for debugability
 
 
 def canny_border(img, low_threshold, high_threshold):
@@ -164,6 +164,7 @@ def HoughLines(img, image, min_votes):
 def make_points_set(points):
     pset = []
     i = 0
+
     while i < len(points):
         t = []
 
@@ -231,7 +232,6 @@ def get_book_border(img_path, resize: int = 1024):
 
     image = cv.imread(img_path)
 
-    # books counter pipeline founder
     r = float(resize) / image.shape[1]
     dim = (resize, int(image.shape[0] * r))
     image = cv.resize(image, dim, interpolation=cv.INTER_AREA)

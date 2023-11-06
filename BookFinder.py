@@ -1,5 +1,6 @@
 import border_segmentation as bs
 import book_recognizer as br
+import film_info as fi
 import web_data_parser as wdp
 
 web_data = 'https://www.livelib.ru/books/filming/listview/biglist/~'
@@ -25,6 +26,16 @@ def main():
 
     for book in books:
         print("{} - {}".format(book.author, book.book))
+
+    # get information about films
+    books = fi.get_film_info(books)
+
+    for book in books:
+        print(book)
+
+    # TODO: read information about user preferences
+
+    # TODO: making a list of the most suitable films
 
 
 if __name__ == '__main__':
