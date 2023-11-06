@@ -1,13 +1,11 @@
 import Book
-import math
-import Plotter as plt
 import Rotating as rot
 import easyocr
 from thefuzz import fuzz
+from multiprocessing import Pool
 
 # EASYOCR configuration
 reader = easyocr.Reader(['ru'], gpu=False)
-DEBUG: bool = True
 
 
 def recognize_text(image):
@@ -16,32 +14,16 @@ def recognize_text(image):
                              detail=1,
                              paragraph=False)
     output = []
+
     for (bbox, text, prob) in result:
         if len(text) < 3:
             continue
         output.append(text.lower())
+
     return output
 
 
-def make_rotate_by_angle(image, angle):
-    image_height, image_width = image.shape[0:2]
-    image_rotated = rot.rotate_image(image, angle)
-    image_rotated = rot.crop_around_center(
-        image_rotated,
-        *rot.largest_rotated_rect(
-            image_width,
-            image_height,
-            math.radians(angle)
-        )
-    )
-
-    return image_rotated
-
-
 def book_match(image_text):
-    if DEBUG:
-        print(image_text)
-
     with open("res/data_base.txt", "r", encoding="utf-8") as base:
         while True:
             line = base.readline()
@@ -61,35 +43,39 @@ def book_match(image_text):
     return Book.BookInfo("None", "None"), False
 
 
+def book_process(image, angle):
+    image_rotated = rot.make_rotate_by_angle(image.copy(), angle)
+    image_text = recognize_text(image_rotated)
+    if len(image_text) == 0:
+        return Book.BookInfo("None", "None"), False
+
+    return book_match(image_text)
+
+
 def book_recognizer(image, borders):
     books = []
     books_founded_counter = 0
-    for border in borders:
-        try:
-            image_cropped = image[border.y0:border.y1, border.x0:border.x1]
 
-            for angle in [0, 90, 180, 270]:
-                image_rotated = make_rotate_by_angle(image_cropped.copy(), angle)
-                if DEBUG:
-                    plt.image_plot(image_rotated, color='color')
+    with Pool(processes=4) as pool:
+        for border in borders:
+            try:
+                image_cropped = image[border.y0:border.y1, border.x0:border.x1]
+                multiple_results = [pool.apply_async(book_process, args=(image_cropped, angle))
+                                    for angle in [0, 90, 180, 270]]
 
-                image_text = recognize_text(image_rotated)
-                if len(image_text) == 0:
-                    continue
+                for res in multiple_results:
+                    book, is_matched = res.get(timeout=60)
 
-                book, is_matched = book_match(image_text)
-
-                if is_matched:
-                    books.append(book)
-                    books_founded_counter += 1
-                    break
-
-        except ValueError:
-            print("Some error has occured")
-            break
-        except Exception as err:
-            print(f"Unexpected {err=}, {type(err)=}")
-            break
+                    if is_matched:
+                        books.append(book)
+                        books_founded_counter += 1
+                        continue
+            except ValueError:
+                print("Some error has occured")
+                break
+            except Exception as err:
+                print(f"Unexpected {err=}, {type(err)=}")
+                break
 
     print("Books was founded={}".format(books_founded_counter))
     return books

@@ -23,15 +23,39 @@ class BoundingBox(object):
 
 class BookInfo(object):
     """
-    Information about author and his book
+    Information about filmed book
     """
+    year: int
+    genres: str
+    countries: str
+    rating: float
+    duration: str
 
     def __init__(self, author: str, book: str):
         self.author = author
         self.book = book
+
+    def __str__(self):
+        return f"{self.author} - {self.book}\n{self.genres}\n{self.countries}\n{self.rating}\n"\
+               f"{self.duration}\n"
 
     def get_author_name(self):
         return self.author
 
     def get_book_name(self):
         return self.book
+
+    def set_year(self, year):
+        self.year = year
+
+    def set_genres(self, genres):
+        self.genres = genres
+
+    def set_countries(self, countries):
+        self.countries = countries
+
+    def set_rating(self, rating):
+        self.rating = rating
+
+    def set_duration(self, duration):
+        self.duration = duration
