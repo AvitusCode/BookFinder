@@ -1,33 +1,35 @@
-import border_segmentation as bs
-import book_recognizer as br
+from Globals import GlobalOptions
+from border_segmentation import get_book_border
+from book_recognizer import book_recognizer_func
+from web_data_parser import save_data_base
 import film_info as fi
-import web_data_parser as wdp
 
-web_data = 'https://www.livelib.ru/books/filming/listview/biglist/~'
-web_pages_count = 2
 
 # TODO:
 # 1) improve book border recognition
 # 2) improve book text recognition
-# 3) make json file for base configuration
+# 3) make json file for base configuration (OPTIONAL)
 # 4) Introduce algorithm for rating films
 # 5) refactoring and debuging
 
 
+# 19.11.2023 soft deadline
+# 26.11.2023 hard deadline (The main pipeline should already be ready by this point.
+# The remaining time will be devoted to improvements)
+
 def main():
-    image, books = bs.get_book_border('debug_data/debug_books_5.jpg')
+    g = GlobalOptions()
+    # 1) get books border
+    image, books = get_book_border(g, 'debug_data/debug_books_5.jpg')
 
-    # then wee save books to the file
-    for book in books:
-        print("[(x0={}, y0={}), (x1={}, y1={})]".format(book.x0, book.y0, book.x1, book.y1))
+    # load info about filming books
+    if g.is_need_web_info:
+        save_data_base(g.web_database_url, g.web_pages_count)
 
-    # wdp.save_data_base(web_data, web_pages_count)
-    books = br.book_recognizer(image, books)
+    # 2) recognize book
+    books = book_recognizer_func(g, image, books)
 
-    for book in books:
-        print("{} - {}".format(book.author, book.book))
-
-    # get information about films
+    # 3) get information about films
     books = fi.get_film_info(books)
 
     for book in books:

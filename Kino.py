@@ -56,7 +56,6 @@ class KP:
         self.headers = {'X-API-KEY': self.token, 'Content-Type': 'application/json'}
         self.api_version = 'v2.1'
         self.API = 'https://kinopoiskapiunofficial.tech/api/' + self.api_version + '/'
-        self.secret_API = 'https://videocdn.tv/api/short'
         self.version = self.api_version + '.2-release'
         self.about = 'KinoPoiskAPI'
 

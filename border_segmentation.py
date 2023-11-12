@@ -43,11 +43,11 @@ def close_image(img, x, y):
     return closed
 
 
-def connected_components(edge_map):
+def connected_components(edge_map, connectivity):
     """
     Connected components are detected in the edge map, that we arrived from canny algo
     """
-    levels, proc_img = cv.connectedComponents(edge_map, connectivity=8)
+    levels, proc_img = cv.connectedComponents(edge_map, connectivity=connectivity)
 
     if DEBUG:
         print('Find connected components, levels=', levels)
@@ -200,7 +200,7 @@ def take_new_points(points_set, points):
     return new_points
 
 
-def merge_lines(points, image):
+def merge_lines(points, image, edge_threshold):
     points.sort(key=lambda point: point[0][0])
     points = points
 
@@ -211,8 +211,8 @@ def merge_lines(points, image):
     pset = make_points_set(new_points)
     new_points2 = take_new_points(pset, new_points)
 
-    if image.shape[1] - new_points2[-1][0][0] >= 50:
-        new_points2.append([(image.shape[1] - 5, 0), (image.shape[1] - 5, image.shape[0] - 1), 90])
+    if image.shape[1] - new_points2[-1][0][0] >= edge_threshold:
+        new_points2.append([(image.shape[1] - 5, 0), (image.shape[1] - 5, image.shape[0] - 1)])
 
     output = image.copy()
 
@@ -228,23 +228,32 @@ def merge_lines(points, image):
 
 
 # Main working function
-def get_book_border(img_path, resize: int = 1024):
-
+def get_book_border(g, img_path):
+    global DEBUG
+    DEBUG = g.is_debug
     image = cv.imread(img_path)
+    assert image is not None, "file could not be read, check with os.path.exists()"
 
-    r = float(resize) / image.shape[1]
-    dim = (resize, int(image.shape[0] * r))
+    r = float(g.resize) / image.shape[1]
+    dim = (g.resize, int(image.shape[0] * r))
     image = cv.resize(image, dim, interpolation=cv.INTER_AREA)
 
     print(image.shape)
 
-    # Main pipeline (maybe incapsulate it into the class?)
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    edged = canny_border(gray, 50, 150)
-    proc_img, levels = connected_components(edged)
-    proc_img = remove_short_clusters(proc_img, levels, threshold=200)
-    points = HoughLines(proc_img, image, 130)
-    points, proc_img = merge_lines(points, image)
+
+    if g.is_gaussian_blur:
+        gray = gauss_blur(gray, g.gauss_filter_size, g.gauss_sigma)
+
+    edged = canny_border(gray, g.canny_low_threshold, g.canny_high_threshold)
+
+    if g.is_image_close:
+        edged = close_image(edged, g.close_size, g.close_size)
+
+    proc_img, levels = connected_components(edged, g.connectivity)
+    proc_img = remove_short_clusters(proc_img, levels, g.remove_short_clusters_threshold)
+    points = HoughLines(proc_img, image, g.hough_min_votes)
+    points, proc_img = merge_lines(points, image, g.theta_threshold)
 
     books = []
     for i in range(len(points) - 1):
