@@ -1,0 +1,18 @@
+{
+      "Dmitry Yarmak": {
+            "user_id": 1,
+            "years": "1981-2023",
+            "genres": "Ужасы Драма Триллер",
+            "countries": "США Россия Германия Великобритания",
+            "rating": "5.5-10.0",
+            "duration": "90-200"
+      },
+      "some user": {
+            "user_id": 2,
+            "years": "2020-2023",
+            "genres": "Драма Комедия",
+            "countries": "США Россия",
+            "rating": "8.0-10.0",
+            "duration": "90-120"
+      }
+}

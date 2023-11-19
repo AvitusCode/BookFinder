@@ -16,6 +16,15 @@ def read_secret_token() -> str:
     raise Exception("There is no token file!")
 
 
+def time_to_minutes(time: str):
+    hours, minutes = time.split(":")
+    a = int(hours)
+    b = int(minutes)
+    if b == 0:
+        b = 60
+    return a * 60 + b
+
+
 def get_film_info(books):
     kino = KP(token=read_secret_token(), tries=10)
 
@@ -35,12 +44,14 @@ def get_film_info(books):
             continue
 
         for item in search:
-            film = Book.BookInfo(book.get_author_name(), item.ru_name)
+            film = Book.BookInfo(book.get_author_name(), book.get_book_name())
+            film.set_film_name(item.ru_name)
             film.set_year(int(item.year))
             film.set_genres(" ".join(item.genres))
             film.set_countries(" ".join(item.countries))
             film.set_rating(item.kp_rate)
-            film.set_duration(item.duration)
+            film.set_duration(time_to_minutes(item.duration))
+            film.set_film_id(item.kp_id)
             filmed_books.append(film)
 
     return filmed_books
