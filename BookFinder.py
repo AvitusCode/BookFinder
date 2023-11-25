@@ -2,20 +2,15 @@ from Globals import GlobalOptions
 from border_segmentation import get_book_border
 from book_recognizer import book_recognizer_func
 from web_data_parser import save_data_base
-import film_info as fi
+from film_info import get_film_info
+from Rating import make_rating
+import sys
 
-
-# TODO:
+# TODO: testing and debuging +
 # 1) improve book border recognition
 # 2) improve book text recognition
-# 3) make json file for base configuration (OPTIONAL)
-# 4) Introduce algorithm for rating films
-# 5) refactoring and debuging
+# 3) improve ranking system
 
-
-# 19.11.2023 soft deadline
-# 26.11.2023 hard deadline (The main pipeline should already be ready by this point.
-# The remaining time will be devoted to improvements)
 
 def main():
     g = GlobalOptions()
@@ -28,16 +23,18 @@ def main():
 
     # 2) recognize book
     books = book_recognizer_func(g, image, books)
+    if len(books) == 0:
+        print("Cannot recognize a books")
+        sys.exit(0)
 
     # 3) get information about films
-    books = fi.get_film_info(books)
+    books = get_film_info(books)
 
-    for book in books:
-        print(book)
+    if len(books) == 0:
+        print("Cannot find film from the database")
+        sys.exit(0)
 
-    # TODO: read information about user preferences
-
-    # TODO: making a list of the most suitable films
+    make_rating(books)
 
 
 if __name__ == '__main__':

@@ -25,19 +25,32 @@ class BookInfo(object):
     """
     Information about filmed book
     """
+    film_title: str
     year: int
     genres: str
     countries: str
     rating: float
-    duration: str
+    duration: int  # in minutes
+
+    # optional params
+    film_id: int
 
     def __init__(self, author: str, book: str):
         self.author = author
         self.book = book
 
     def __str__(self):
-        return f"{self.author} - {self.book}\n{self.genres}\n{self.countries}\n{self.rating}\n"\
+        return f"{self.author} - {self.film_title}\n{self.genres}\n{self.countries}\n{self.rating}\n"\
                f"{self.duration}\n"
+
+    def data_to_dict(self):
+        return {
+            "year": self.year,
+            "genres": self.genres,
+            "countries": self.countries,
+            "rating": self.rating,
+            "duration": self.duration
+        }
 
     def get_author_name(self):
         return self.author
@@ -59,3 +72,9 @@ class BookInfo(object):
 
     def set_duration(self, duration):
         self.duration = duration
+
+    def set_film_id(self, film_id):
+        self.film_id = film_id
+
+    def set_film_name(self, film_title):
+        self.film_title = film_title

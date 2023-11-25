@@ -81,5 +81,5 @@ def book_recognizer_func(g, image, borders):
                 print(f"Unexpected {err=}, {type(err)=}")
                 break
 
-    print("Books was founded={}".format(books_founded_counter))
+    print("Books was founded={}\n\n".format(books_founded_counter))
     return books

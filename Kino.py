@@ -4,9 +4,10 @@ import xml.etree.ElementTree as xml
 import requests
 import json
 import decimal
+import sys
 
 
-# API from: https://kinopoiskapiunofficial.tech
+# API for the data extraction from this resource: https://kinopoiskapiunofficial.tech
 
 
 def rank_to_float(rank):
@@ -60,7 +61,7 @@ class KP:
         self.about = 'KinoPoiskAPI'
 
     def get_film_by_id(self, film_id):
-        cache = CACHE().load()
+        cache = CACHE('FIND').load()
 
         if str(film_id) in cache:
             print('film was founded in cache!')
@@ -70,38 +71,38 @@ class KP:
             return FILM(data)
 
         request = requests.get(f'https://rating.kinopoisk.ru/{film_id}.xml')
+        kp_rate = 0
+        imdb_rate = 0
 
-        if self.is_request_failed(request):
-            return None
-
-        rate_request = request.text
-
-        try:
-            kp_rate = xml.fromstring(rate_request)[0].text
-        except IndexError:
-            kp_rate = 0
-        try:
-            imdb_rate = xml.fromstring(rate_request)[1].text
-        except IndexError:
-            imdb_rate = 0
+        if not self.is_request_failed(request):
+            rate_request = request.text
+            try:
+                kp_rate = xml.fromstring(rate_request)[0].text
+            except IndexError:
+                kp_rate = 0
+            try:
+                imdb_rate = xml.fromstring(rate_request)[1].text
+            except IndexError:
+                imdb_rate = 0
 
         for _ in range(self.tries):
             try:
                 request = requests.get(self.API + 'films/' + str(film_id), headers=self.headers)
 
                 if self.is_request_failed(request):
-                    return None
+                    time.sleep(0.5)
+                    continue
 
                 request_json = json.loads(request.text)
                 request_json['kinopoiskId'] = kp_rate
                 request_json['ratingImdb'] = imdb_rate
                 cache[str(film_id)] = request_json
 
-                CACHE().write(cache)
+                CACHE('FIND').write(cache)
                 return FILM(request_json)
             except (json.decoder.JSONDecodeError, KeyError):
-                time.sleep(0.5)
-                continue
+                print('catch exception wile parsing film info')
+                sys.exit(-1)
 
     def search_by_keywords(self, query):
         for _ in range(self.tries):
@@ -110,7 +111,8 @@ class KP:
                                        params={"keyword": query, "page": 1})
 
                 if self.is_request_failed(request):
-                    return None
+                    time.sleep(0.5)
+                    continue
 
                 request_json = json.loads(request.text)
                 output = []
@@ -121,8 +123,8 @@ class KP:
                         continue
                 return output
             except (json.decoder.JSONDecodeError, KeyError):
-                time.sleep(0.5)
-                continue
+                print('catch exception wile parsing film info')
+                sys.exit(-1)
 
         print('Search request timeout')
         return None
@@ -135,22 +137,29 @@ class KP:
         elif req.status_code == 402:
             print("To much requests for this day!")
             return True
-        print("Request status={}".format(req.status_code))
         return False
 
 
 class CACHE:
     json_buffer = {}
 
-    def __init__(self):
+    def __init__(self, cache_type: str):
         self.PATH = os.path.dirname(os.path.abspath(__file__))
+        self.path_to_file = ''
+
+        if cache_type == 'FIND':
+            self.path_to_file = '/res/cache_find.json'
+        elif cache_type == 'SEARCH':
+            self.path_to_file = '/res/cache_search.json'
+        else:
+            raise ValueError('Invalid cache type argument in the film_info API')
 
     def load(self) -> dict:
         try:
-            with open(self.PATH + '/res/cache.json', 'r') as f:
+            with open(self.PATH + self.path_to_file, 'r') as f:
                 return json.loads(f.read())
         except FileNotFoundError:
-            with open(self.PATH + '/res/cache.json', 'w') as f:
+            with open(self.PATH + self.path_to_file, 'w') as f:
                 f.write('{}')
                 return {}
 
@@ -161,7 +170,7 @@ class CACHE:
         self.write(self.json_buffer)
 
     def write(self, cache: dict, indent: int = 4):
-        with open(self.PATH + '/res/cache.json', 'w') as f:
+        with open(self.PATH + self.path_to_file, 'w') as f:
             if len(cache) == 0:
                 return None
             return json.dump(cache, f, indent=indent)
