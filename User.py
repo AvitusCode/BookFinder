@@ -29,9 +29,9 @@ class User(object):
     def in_years(self, year):
         a, b = self.years.split("-")
         if int(a) <= year <= int(b):
-            return 1
+            return 1.0
         else:
-            return -1
+            return -1.0
 
     def in_rating(self, rating):
         a, b = self.rating.split("-")
@@ -43,30 +43,28 @@ class User(object):
     def in_duration(self, duration):
         a, b = self.duration.split("-")
         if int(a) <= duration <= int(b):
-            return 1
+            return 1.0
         else:
-            return -1
+            return -1.0
 
     def in_countries(self, countries):
         data = self.countries.split(" ")
         data = [word.lower() for word in data]
-        match = 0
+        match = 0.0
         for country in countries:
             if country.lower() in data:
-                match += 1
+                match += 1.0
             else:
-                match -= 1
-        return match
+                match -= 1.0
+        return match / len(data)
 
     def in_genres(self, genres):
         data = self.genres.split(" ")
         data = [word.lower() for word in data]
-        match = 0
+        match = 0.0
         for genre in genres:
             if genre.lower() in data:
-                match += 1
+                match += 1.0
             else:
-                match -= 1
-        return match
-
-
+                match -= 1.0
+        return match / len(data)

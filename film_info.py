@@ -20,8 +20,6 @@ def time_to_minutes(time: str):
     hours, minutes = time.split(":")
     a = int(hours)
     b = int(minutes)
-    if b == 0:
-        b = 60
     return a * 60 + b
 
 

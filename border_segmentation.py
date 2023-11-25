@@ -142,9 +142,11 @@ def HoughLines(img, image, min_votes):
         else:
             theta_values[theta] = 1
 
-    print(theta_values)
     dominant_dir = max(theta_values, key=theta_values.get)
-    print("Dominant Direction", dominant_dir)
+
+    if DEBUG:
+        print(theta_values)
+        print("Dominant Direction", dominant_dir)
 
     for p in temp_points:
         (x3, y3), (x4, y4), t = p
@@ -238,7 +240,8 @@ def get_book_border(g, img_path):
     dim = (g.resize, int(image.shape[0] * r))
     image = cv.resize(image, dim, interpolation=cv.INTER_AREA)
 
-    print(image.shape)
+    if DEBUG:
+        print("Image shape: {}".format(image.shape))
 
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 

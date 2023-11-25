@@ -6,15 +6,11 @@ from film_info import get_film_info
 from Rating import make_rating
 import sys
 
-# TODO:
+# TODO: testing and debuging +
 # 1) improve book border recognition
 # 2) improve book text recognition
-# 3) improve ranking system (maybe by using ML algorithms)
+# 3) improve ranking system
 
-
-# 19.11.2023 soft deadline (simple ranking system was introduced!)
-# 26.11.2023 hard deadline (The main pipeline should already be ready by this point.
-# The remaining time will be devoted to improvements)
 
 def main():
     g = GlobalOptions()
