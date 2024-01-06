@@ -9,7 +9,6 @@ import sys
 # TODO: testing and debuging +
 # 1) improve book border recognition
 # 2) improve book text recognition
-# 3) improve ranking system
 
 
 def main():
@@ -17,7 +16,7 @@ def main():
     # 1) get books border
     image, books = get_book_border(g, 'debug_data/debug_books_5.jpg')
 
-    # load info about filming books
+    # (Optional step) load info about filming books
     if g.is_need_web_info:
         save_data_base(g.web_database_url, g.web_pages_count)
 
@@ -34,7 +33,8 @@ def main():
         print("Cannot find film from the database")
         sys.exit(0)
 
-    make_rating(books)
+    # 4) make ranking list
+    make_rating(g, books)
 
 
 if __name__ == '__main__':

@@ -22,22 +22,18 @@ class BoundingBox(object):
 
 
 class BookInfo(object):
-    """
-    Information about filmed book
-    """
-    film_title: str
-    year: int
-    genres: str
-    countries: str
-    rating: float
-    duration: int  # in minutes
-
-    # optional params
-    film_id: int
-
     def __init__(self, author: str, book: str):
         self.author = author
         self.book = book
+        self.film_title: str
+        self.year: int
+        self.genres: str
+        self.countries: str
+        self.rating: float
+        self.duration: int  # in minutes
+
+        # optional params
+        self.film_id: int
 
     def __str__(self):
         return f"{self.author} - {self.film_title}\n{self.genres}\n{self.countries}\n{self.rating}\n"\
