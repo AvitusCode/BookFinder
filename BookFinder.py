@@ -6,15 +6,11 @@ from film_info import get_film_info
 from Rating import make_rating
 import sys
 
-# TODO: testing and debuging +
-# 1) improve book border recognition
-# 2) improve book text recognition
-
 
 def main():
     g = GlobalOptions()
     # 1) get books border
-    image, books = get_book_border(g, 'debug_data/debug_books_5.jpg')
+    image, books = get_book_border(g, 'debug_data/debug_books_2.jpg')
 
     # (Optional step) load info about filming books
     if g.is_need_web_info:
@@ -25,6 +21,9 @@ def main():
     if len(books) == 0:
         print("Cannot recognize a books")
         sys.exit(0)
+    if g.is_debug:
+        for book in books:
+            print("{}, {}".format(book.get_author_name(), book.get_book_name()))
 
     # 3) get information about films
     books = get_film_info(books)

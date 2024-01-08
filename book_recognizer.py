@@ -58,6 +58,7 @@ def book_process(image, angle, reliability):
 
 def book_recognizer_func(g, image, borders):
     books = []
+    book_set = set()
     books_founded_counter = 0
 
     with Pool(processes=4) as pool:
@@ -71,6 +72,9 @@ def book_recognizer_func(g, image, borders):
                     book, is_matched = res.get(timeout=60)
 
                     if is_matched:
+                        if book.get_book_name() in book_set:
+                            continue
+                        book_set.add(book.get_book_name())
                         books.append(book)
                         books_founded_counter += 1
                         continue
