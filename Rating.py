@@ -26,11 +26,11 @@ def check_correctness(user_diap: str, y, info: str):
 
 def make_country_feature_vec(features: str):
     vec = null_array(len(_COUNTRIES_))
-    splited_features = features.split()
+    splited_features = features.split(', ')
 
     for i in range(len(_COUNTRIES_)):
         for country in splited_features:
-            if country == _COUNTRIES_[i]:
+            if country.lower() == _COUNTRIES_[i].lower():
                 vec[i] = 1.0
 
     return vec
@@ -38,11 +38,11 @@ def make_country_feature_vec(features: str):
 
 def make_genres_feature_vec(features: str):
     vec = null_array(len(_GENRES_))
-    splited_features = features.split()
+    splited_features = features.split(', ')
 
     for i in range(len(_GENRES_)):
         for genre in splited_features:
-            if genre == _GENRES_[i]:
+            if genre.lower() == _GENRES_[i].lower():
                 vec[i] = 1.0
 
     return vec
@@ -97,7 +97,7 @@ def load_user_by_name(name):
         return user
 
 
-def load_users_all(g):
+def load_users_all():
     users = []
     with open("users_profile.json", 'r') as file:
         data = json.load(file)
@@ -153,7 +153,7 @@ def content_based_recommendations(g, users, movies):
 
 def make_rating(g, films, top_n=10):
     top_n = min(top_n, len(films))
-    users = load_users_all(g)
+    users = load_users_all()
 
     if len(users) == 0:
         print('WARNING: no users in the system!')
