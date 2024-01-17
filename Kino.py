@@ -17,8 +17,9 @@ def rank_to_float(rank):
 
 
 class FILM:
-    def __init__(self, data: dict):
-        self.kp_id = data['kinopoiskId']
+    def __init__(self, input_data: dict):
+        data = input_data['data']
+        self.kp_id = data['filmId']
         self.name = data['nameRu'] if data['nameEn'] == '' else data['nameEn']
         self.ru_name = data['nameRu']
         self.year = data['year'].split('-')[0] if data['type'] != 'FILM' else data['year']
@@ -28,23 +29,23 @@ class FILM:
         self.genres = [genre['genre'] for genre in data['genres']]
         self.countries = [country['country'] for country in data['countries']]
         self.age_rating = data['ratingAgeLimits']
-        self.kp_rate = rank_to_float(data['ratingKinopoisk'])
-        self.imdb_rate = rank_to_float(data['ratingImdb'])
+        self.kp_rate = rank_to_float(input_data['ratingKinopoisk'])
+        self.imdb_rate = rank_to_float(input_data['ratingImdb'])
         self.kp_url = data['webUrl']
         self.poster = data['posterUrl']
         self.poster_preview = data['posterUrlPreview']
 
 
 class SEARCH:
-    def __init__(self, data: dict):
+    def __init__(self, data: dict, is_film: bool = False, raiting = '0.0'):
         self.kp_id = data['filmId']
         self.name = data['nameRu'] if data['nameEn'] == '' else data['nameEn']
         self.ru_name = data['nameRu']
-        self.year = data['year'].split('-')[0]
+        self.year = data['year'].split('-')[0] if not is_film else data['year']
         self.duration = data['filmLength']
         self.genres = [genre['genre'] for genre in data['genres']]
         self.countries = [country['country'] for country in data['countries']]
-        self.kp_rate = rank_to_float(data['rating'])
+        self.kp_rate = rank_to_float(data['rating'] if not is_film else raiting)
         self.kp_url = f'https://www.kinopoisk.ru/film/{data["filmId"]}/'
         self.poster = data['posterUrl']
         self.poster_preview = data['posterUrlPreview']
@@ -94,7 +95,7 @@ class KP:
                     continue
 
                 request_json = json.loads(request.text)
-                request_json['kinopoiskId'] = kp_rate
+                request_json['ratingKinopoisk'] = kp_rate
                 request_json['ratingImdb'] = imdb_rate
                 cache[str(film_id)] = request_json
 
@@ -121,6 +122,12 @@ class KP:
                         output.append(SEARCH(film))
                     except (Exception, BaseException):
                         continue
+
+                cache = CACHE('FIND').load()
+                for film in cache:
+                    if str(cache[str(film)]['data']['nameRu']).strip() == str(query).strip():
+                        output.append(SEARCH(cache[str(film)]['data'], is_film=True, raiting=cache[str(film)]['ratingKinopoisk']))
+
                 return output
             except (json.decoder.JSONDecodeError, KeyError):
                 print('catch exception wile parsing film info')
@@ -156,10 +163,10 @@ class CACHE:
 
     def load(self) -> dict:
         try:
-            with open(self.PATH + self.path_to_file, 'r') as f:
+            with open(self.PATH + self.path_to_file, 'r', encoding='utf-8') as f:
                 return json.loads(f.read())
         except FileNotFoundError:
-            with open(self.PATH + self.path_to_file, 'w') as f:
+            with open(self.PATH + self.path_to_file, 'w', encoding='utf-8') as f:
                 f.write('{}')
                 return {}
 
@@ -170,7 +177,7 @@ class CACHE:
         self.write(self.json_buffer)
 
     def write(self, cache: dict, indent: int = 4):
-        with open(self.PATH + self.path_to_file, 'w') as f:
+        with open(self.PATH + self.path_to_file, 'w', encoding='utf-8') as f:
             if len(cache) == 0:
                 return None
             return json.dump(cache, f, indent=indent)

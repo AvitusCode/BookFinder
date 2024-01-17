@@ -29,11 +29,11 @@ def get_film_info(books):
     filmed_books = []
 
     if DEBUG:
-        tenet = kino.get_film_by_id(1236063)
-        print(tenet.ru_name, tenet.year)
-        print(", ".join(tenet.genres))
-        print(", ".join(tenet.countries))
-        print("Rank {}".format(tenet.kp_rate))
+        Quiet_Done = kino.get_film_by_id(42248)
+        print(Quiet_Done.ru_name, Quiet_Done.year)
+        print(", ".join(Quiet_Done.genres))
+        print(", ".join(Quiet_Done.countries))
+        print("Rank {}".format(Quiet_Done.kp_rate))
         return filmed_books
 
     for book in books:

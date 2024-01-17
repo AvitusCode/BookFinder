@@ -151,7 +151,7 @@ def content_based_recommendations(g, users, movies):
     return srank_movie
 
 
-def make_rating(g, films, top_n=10):
+def make_rating(g, films, top_n=20):
     top_n = min(top_n, len(films))
     users = load_users_all()
 
