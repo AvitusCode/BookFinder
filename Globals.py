@@ -2,6 +2,8 @@
 
 class GlobalOptions(object):
     def __init__(self):
+        self.is_train_necessary: bool = False
+        self.train_data_count: int = 29
         self.is_debug: bool = False
         # image options
         self.resize: int = 1024

@@ -11,7 +11,7 @@ reader = easyocr.Reader(['ru'], gpu=False)
 
 def recognize_text(image):
     result = reader.readtext(image,
-                             allowlist='АаБбВвГгДдЕеЁёЖжЗзИиЙйКкЛлМмНнОоПпРрСсТтУФфХхЦцЧчШшЩщЪъЫыЬьЭэЮюЯя -0123456789',
+                             allowlist='АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя -0123456789',
                              detail=1,
                              paragraph=False)
     output = []
