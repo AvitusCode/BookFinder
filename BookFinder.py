@@ -8,6 +8,8 @@ from TrainModule import prepare_raw_data
 import sys
 import argparse
 
+# global TODO: fix training mechanism for easyOCR
+
 
 def main():
     g = GlobalOptions()
@@ -56,6 +58,11 @@ def main():
 
     # 4) make ranking list
     make_rating(g, books)
+
+    # 5) TODO: After the rating is formed, users rate the film, after which rank is saved to history
+    # @AvitusCode You need to build a simple user interface for this purpose
+    # Soft Deadline: 03.03.2024; Hard Deadline: 10.03.2024
+    # Then just only debuging, collecting data set and, maybe, training easy OCR
 
 
 if __name__ == '__main__':
