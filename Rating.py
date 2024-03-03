@@ -151,7 +151,20 @@ def content_based_recommendations(g, users, movies):
     return srank_movie
 
 
-def make_rating(g, films, top_n=20):
+class MoivesMetadata(object):
+    def __init__(self, movies_info, movies_pos_id):
+        self.movies_info = movies_info
+        self.movies_pos_id = movies_pos_id
+
+
+def make_rating(g, films, top_n=10):
+    '''
+    :param g: global params
+    :param films: films that was found
+    :param top_n: default count of the films in ranking list
+    :return: dict <film id <-> film info> and users
+    '''
+
     top_n = min(top_n, len(films))
     users = load_users_all()
 
@@ -166,14 +179,20 @@ def make_rating(g, films, top_n=20):
         return
 
     pos_in_rating = 1
-    for rank, id in movie_rank:
-        print("Film № {} : {}, {}, rating {}".format(pos_in_rating, films[id].film_title, films[id].year,
-                                                     films[id].rating))
+    movies_info = {}
+    movies_pos_id = {}
+    for rank, idx in movie_rank:
+        info = "Film № {} : {}, {}, rating {}".format(pos_in_rating, films[idx].film_title, films[idx].year, films[idx].rating)
+        movies_info[idx].append(info)
+        movies_pos_id[pos_in_rating].append(idx)
+        print(info)
         if g.is_debug:
-            print(f"rank = {rank}, id = {id}")
+            print(f"rank = {rank}, id = {idx}")
 
         pos_in_rating += 1
         if pos_in_rating == top_n:
             break
+    result = MoivesMetadata(movies_info, movies_pos_id)
+    # TODO: save info to movie csv
 
-    print("\n\nPlease, make a choice and enjoy watching! :D")
+    return result, users

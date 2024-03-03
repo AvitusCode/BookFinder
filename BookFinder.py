@@ -5,6 +5,8 @@ from web_data_parser import save_data_base
 from film_info import get_film_info
 from Rating import make_rating
 from TrainModule import prepare_raw_data
+from RecomendationSystem import get_recommendation_system
+from Interface import run_interface
 import sys
 import argparse
 
@@ -57,12 +59,17 @@ def main():
         sys.exit(0)
 
     # 4) make ranking list
-    make_rating(g, books)
+    movies_metadata, users = make_rating(g, books)
 
     # 5) TODO: After the rating is formed, users rate the film, after which rank is saved to history
     # @AvitusCode You need to build a simple user interface for this purpose
     # Soft Deadline: 03.03.2024; Hard Deadline: 10.03.2024
     # Then just only debuging, collecting data set and, maybe, training easy OCR
+
+    recommender = get_recommendation_system(g)
+
+    # 6) Run console user interface
+    run_interface(g, recommender, users, movies_metadata)
 
 
 if __name__ == '__main__':
