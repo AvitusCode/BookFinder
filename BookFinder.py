@@ -5,8 +5,16 @@ from web_data_parser import save_data_base
 from film_info import get_film_info
 from Rating import make_rating
 from TrainModule import prepare_raw_data
+from RecomendationSystem import get_recommendation_system
+from Interface import run_interface
 import sys
 import argparse
+
+# TODO: after this steps the project will be finish
+# 1) fix bugs in recommender system
+# 2) More flexible saving and loading mechanism for the the film and the user info
+# 3) fix easyOCR ML moder trainer
+#
 
 
 def main():
@@ -55,7 +63,13 @@ def main():
         sys.exit(0)
 
     # 4) make ranking list
-    make_rating(g, books)
+    movies_metadata, users = make_rating(g, books)
+
+    # 5) Build recommender system
+    recommender = get_recommendation_system(g)
+
+    # 6) Run console user interface
+    run_interface(g, recommender, users, movies_metadata)
 
 
 if __name__ == '__main__':
