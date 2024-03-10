@@ -2,9 +2,13 @@ from User import User
 import json
 import sys
 import numpy as np
+import pandas as pd
+import csv
 from Globals import _COUNTRIES_
 from Globals import _GENRES_
 
+
+const_start_id = 3952
 
 # A few support functions
 def null_array(n):
@@ -151,10 +155,22 @@ def content_based_recommendations(g, users, movies):
     return srank_movie
 
 
+# Films and info sorted by rang
 class MoivesMetadata(object):
-    def __init__(self, movies_info, movies_pos_id):
+    def __init__(self, n, movies_id, movies_info):
+        self.size = n
+        self.movies_id = movies_id
         self.movies_info = movies_info
-        self.movies_pos_id = movies_pos_id
+
+
+def save_films_info(g, movies_id, movies_genre, movies_title):
+    line = []
+    for i in range(len(movies_id)):
+        line.append([int(movies_id[i]), str(movies_title[i]), "|".join(movies_genre[i].split(', '))])
+
+    if len(line) != 0:
+        df_new_data = pd.DataFrame(line, columns=["movieId", "title", "genres"])
+        df_new_data.to_csv(g.movies_data, mode='a', sep=';', header=False, index=False)
 
 
 def make_rating(g, films, top_n=10):
@@ -179,12 +195,18 @@ def make_rating(g, films, top_n=10):
         return
 
     pos_in_rating = 1
-    movies_info = {}
-    movies_pos_id = {}
+    movies_info = []
+    movies_id = []
+    movies_title = []
+    movies_genre = []
     for rank, idx in movie_rank:
         info = "Film № {} : {}, {}, rating {}".format(pos_in_rating, films[idx].film_title, films[idx].year, films[idx].rating)
-        movies_info[idx].append(info)
-        movies_pos_id[pos_in_rating].append(idx)
+
+        movies_id.append(films[idx].film_id + const_start_id)
+        movies_info.append(info)
+        movies_title.append(films[idx].film_title)
+        movies_genre.append(films[idx].genres)
+
         print(info)
         if g.is_debug:
             print(f"rank = {rank}, id = {idx}")
@@ -192,7 +214,7 @@ def make_rating(g, films, top_n=10):
         pos_in_rating += 1
         if pos_in_rating == top_n:
             break
-    result = MoivesMetadata(movies_info, movies_pos_id)
-    # TODO: save info to movie csv
+    result = MoivesMetadata(len(movies_id), movies_id, movies_info)
+    save_films_info(g, movies_id, movies_genre, movies_title)
 
     return result, users

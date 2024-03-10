@@ -1,29 +1,31 @@
-import csv
+import pandas as pd
 
 
 def show_movies(movies_metadata):
-    for pos_idx, movie_id in movies_metadata.movies_pos_id:
-        print(f"[{pos_idx}]: {movies_metadata.movies_info[movie_id]}")
+    for i in range(movies_metadata.size):
+        print(f"[{i}]: id={movies_metadata.movies_id[i]}, {movies_metadata.movies_info[i]}")
 
 
 def movie_interface(recommender, movies_metadata):
     while True:
         command = input("[rh] Recommend film on history, [rf] Recommend on film, [m] Rank film, "
-                        "[q] Select another user, [h] Show movies again")
+                        "[q] Select another user, [h] Show movies again\n")
 
         match command:
             case "rh":
                 print(recommender.recommend_on_history())
             case "rf":
-                movie_id = input("Select movieId: ")
-                if movie_id not in movies_metadata.movies_info.keys():
+                movie_id = int(input("Select movieId: "))
+                if movie_id not in movies_metadata.movies_id:
                     print("No such movie, try again")
+                    continue
                 print(recommender.recommend_on_movie(movie_id))
             case "m":
-                movie_id = input("Select movieId: ")
-                rank = input("Set a raiting: ")
-                if movie_id not in movies_metadata.movies_info.keys():
+                movie_id = int(input("Select movieId: "))
+                if movie_id not in movies_metadata.movies_id:
                     print("No such movie, try again")
+                    continue
+                rank = float(input("Set a raiting: "))
                 return movie_id, rank
             case "h":
                 show_movies(movies_metadata)
@@ -39,27 +41,37 @@ class UserMetadata(object):
 
 
 def data_on_save(g, users_choises):
-    # TODO: save user data to raiting csv
-    pass
+    line = []
+    for user_id, metadata in users_choises:
+        line.append([int(user_id), int(metadata.movie_id), metadata.rating, 0])
+
+    if len(line) != 0:
+        df_new_data = pd.DataFrame(line, columns=["userId", "movieId", "rating", "timestamp"])
+        df_new_data.to_csv(g.movies_data, mode='a', sep=';', header=False, index=False)
 
 
 def run_interface(g, recommender, users, movies_metadata):
     print("\n\nPlease rate the movie after watching! :D")
     print("List of the movies")
-    show_movies(movies_metadata)
 
     users_choises = {}
     while True:
-        command = input("[u] Select a user, [h] Show movies again, [q] Quiet")
+        command = input("[u] Select a user, [h] Show movies again, [q] Quiet\n")
         match command:
             case "u":
-                name = input("Enter your name: ")
+                name = str(input("Enter your name: "))
+                user_choised = False
                 for user in users:
-                    if user.name == name:
+                    if user.name.lower() == name.lower():
                         movie_id, rank = movie_interface(recommender, movies_metadata)
                         if movie_id == -1 and rank == -1:
-                            continue
-                        users_choises[user.user_id].append(UserMetadata(user.user_id, movie_id, rank))
+                            user_choised = True
+                            break
+                        users_choises.update({user.user_id: UserMetadata(user.user_id, movie_id, rank)})
+                        user_choised = True
+                        break
+                if not user_choised:
+                    print("WARNING: this user does not exist")
             case "h":
                 show_movies(movies_metadata)
             case "q":

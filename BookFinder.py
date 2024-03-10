@@ -10,7 +10,11 @@ from Interface import run_interface
 import sys
 import argparse
 
-# global TODO: fix training mechanism for easyOCR
+# TODO: after this steps the project will be finish
+# 1) fix bugs in recommender system
+# 2) More flexible saving and loading mechanism for the the film and the user info
+# 3) fix easyOCR ML moder trainer
+#
 
 
 def main():
@@ -61,11 +65,7 @@ def main():
     # 4) make ranking list
     movies_metadata, users = make_rating(g, books)
 
-    # 5) TODO: After the rating is formed, users rate the film, after which rank is saved to history
-    # @AvitusCode You need to build a simple user interface for this purpose
-    # Soft Deadline: 03.03.2024; Hard Deadline: 10.03.2024
-    # Then just only debuging, collecting data set and, maybe, training easy OCR
-
+    # 5) Build recommender system
     recommender = get_recommendation_system(g)
 
     # 6) Run console user interface

@@ -123,11 +123,6 @@ class KP:
                     except (Exception, BaseException):
                         continue
 
-                cache = CACHE('FIND').load()
-                for film in cache:
-                    if str(cache[str(film)]['data']['nameRu']).strip() == str(query).strip():
-                        output.append(SEARCH(cache[str(film)]['data'], is_film=True, raiting=cache[str(film)]['ratingKinopoisk']))
-
                 return output
             except (json.decoder.JSONDecodeError, KeyError):
                 print('catch exception wile parsing film info')

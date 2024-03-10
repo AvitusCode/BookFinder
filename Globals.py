@@ -43,9 +43,8 @@ class GlobalOptions(object):
         self.duration_diap = 900.0 # in minutes
 
         # For recommender sys
-        self.movies_data  = "res/movies.csv"
+        self.movies_data  = "res/movies2.csv"
         self.ranking_data = "res/ratings.csv"
-        self.users_data   = "res/users.csv"
 
 
 # DATA FEATURE
